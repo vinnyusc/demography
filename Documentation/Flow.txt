@@ -1,0 +1,33 @@
+Client:
+1. Enter a keyword to search
+
+2. Enter mile range if required. Default is 5 miles
+
+3. On submit, user is asked to allow his location details to be sent.
+
+4. On allow, displays the results by fetching from server. On deny, 
+the user is asked to enter a zip code.
+
+5. Plots the points using Places API for javascript
+
+6. On click of one of the result, the map directions is displayed
+    using 'Directions' API for javascript.
+
+7. One click of 'New Search', search form is showed.
+
+
+Server:
+
+1. Receives the input parameters.
+
+2. Uses geocode API to get the geocorodinates from the ZIP code.
+
+3. Uses google Places API to get result from Google
+
+4. Uses yelp API to get results from Yelp
+
+5. Builds common objects/JSON using google GSON
+
+6. Sorts the results based on the distance from source
+
+7. Sends JSON response to Client.
