@@ -1,0 +1,44 @@
+Google and Yelp API
+
+GOOGLE: 
+
+- Google Maps API for Business: 
+http://www.google.com/enterprise/mapsearth/products/mapsapi.html
+
+- Our Applications uses Google maps 'Places' API at the back end: 
+https://developers.google.com/places/documentation/
+
+- In 'Places' API, we are using 'Search' API; Either 'Text Search' or 'Nearby Search'. 
+https://developers.google.com/places/documentation/search
+
+- Also, to find the geocoordinates, we use 'Geocoding' API
+https://developers.google.com/maps/documentation/geocoding/
+
+
+On front end: 
+-We use maps' 'Direction' API for JavaScript to plot points and graph. 
+https://developers.google.com/maps/documentation/javascript/directions
+
+
+
+YELP:(Should meet the requirements before requesting 2.0)
+
+- Currently using API 1.1
+- We require API 2.2 for getting geo coordinates
+- http://www.yelp.com/developers/documentation/v2/search_api
+
+YELP Requirements: 
+-http://www.yelp.com/developers/getting_started/display_requirements
+Additional Requirements for Business Owner Tools:
+
+    You must show whether or not a business has been claimed on Yelp, using the claimed parameter in the APIv2 Business function.
+    
+    You must include a link to biz.yelp.com where the business can claim their Yelp page, and any links such as "Reply to this review" should point to biz.yelp.com as well.
+    
+    You must show the Yelp logo alongside any content from Yelp.
+    
+    Do not enable re-sharing of Yelp content (to Twitter, Facebook, or elsewhere) or republish a stream of Yelp review content.
+    
+    Do not incorporate Yelp information into rating trends, perform semantic analysis on content, or suggest the ability to remove negative reviews.
+    
+    Depending on your site, we may require access to an account to view information as you're presenting it.
