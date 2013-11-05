@@ -4,5 +4,5 @@
 
 4. Code clean: javascript
 
-5. Get phone numbers
+5. DONE - Get phone numbers and ratings
 6. DONE - Fixed major flaw in finding user location. Now uses GPS. 
