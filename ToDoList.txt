@@ -1,6 +1,8 @@
 1. DONE - Change zip code to address
-2. Implement text directions and map for all categories.
+2. DONE - Implement text directions and map for all categories.
 3. DONE - Implement map refresh on 'back to search' results.
+
 4. Code clean: javascript
 
 5. Get phone numbers
+6. DONE - Fixed major flaw in finding user location. Now uses GPS. 
