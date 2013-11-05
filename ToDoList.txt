@@ -2,3 +2,5 @@
 2. Implement text directions and map for all categories.
 3. DONE - Implement map refresh on 'back to search' results.
 4. Code clean: javascript
+
+5. Get phone numbers
