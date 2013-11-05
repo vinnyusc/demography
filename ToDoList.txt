@@ -1,4 +1,4 @@
-1. Change zip code to address
+1. DONE - Change zip code to address
 2. Implement text directions and map for all categories.
-3. Implement map refresh on 'back to search' results.
+3. DONE - Implement map refresh on 'back to search' results.
 4. Code clean: javascript
