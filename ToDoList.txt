@@ -6,3 +6,5 @@
 
 5. DONE - Get phone numbers and ratings
 6. DONE - Fixed major flaw in finding user location. Now uses GPS. 
+
+7. DONE - Filter Yelp and Google Results based on phone numbers(Works well).
