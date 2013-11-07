@@ -102,8 +102,8 @@
              </div>
 
              <div class="form-group">
-               <label class="label label-danger" for="zip">ZIP</label>
-               <input type="text" class="form-control" placeholder="Zip" id = "zip">
+               <label class="label label-danger" for="zip">Nearby Address</label>
+               <input type="text" class="form-control" placeholder="Nearby Address" id = "zip">
              </div>
              <div class="form-group"><br>
               <button type="submit" class="btn btn-default">Submit</button>
@@ -114,10 +114,18 @@
         <div class = "container">
           <div id = "map-canvas">
           </div>
+          <div id = "direction">
+          <ul class="nav nav-tabs" id="direction-tabs">
+            <li class="active" value="WALKING"><a href="#" data-mode="WALKING">Walking</a></li>
+            <li class="" value="TRANSIT"><a href="#" data-mode="TRANSIT">Transit</a></li>
+            <li class="" value="BICYCLING"><a href="#" data-mode="BICYCLING">Bicycling</a></li>
+            <li class="" value="DRIVING"><a href="#" data-mode="DRIVING">Driving</a></li>
+          </ul>
           <div id = "direction-steps">
           </div>
+          </div>
           <button type='button' class="btn btn-default" id="newSearch">New Search</button>
-          <button type='button' class="btn btn-default" id="back">Back to Results</button>
+          <button type='button' class="btn btn-default" id="back" onclick="location.href='#'">Back to Results</button>
           <table class = "table table-striped" id = "tableID">
           </table>
         </div>
@@ -149,11 +157,47 @@
 
       var directionsDisplay;
       var directionsService = new google.maps.DirectionsService();
-
+      var previousMapResults = null;
+      var previousMarker = null;
+      var directionDestination = null;
+      var pIndex = null;
+      var pMode = "WALKING";
+      var gLat = null;
+      var gLng = null;
       $(document).ready(function() {
         $('#newSearch').hide();
         $('#back').hide();
+
+        $('#direction').hide();
+       /* navigator.geolocation.getCurrentPosition(function(position){
+          gLat = position.coords.latitude;
+          gLng = position.coords.longitude;
+          alert(gLat+" "+gLng);
+
+        },{
+              enableHighAccuracy: true
+              ,timeout : 5000
+          });*/
+
+        navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        gLat = position.coords.latitude;
+                        gLng = position.coords.longitude;
+                    },
+                    function(error){
+                        alert(error.message);
+                    }, {
+                        enableHighAccuracy: true
+                        ,timeout : 15000
+                    }
+            );
       });
+
+      function getCoOrdinates(position){
+        gLat = position.coords.latitude;
+        gLng = position.coords.longitude;
+        alert(gLat+" "+gLng);
+      }
 
 
        //getting data id of element clicked
@@ -165,25 +209,55 @@
           $('#searchResults').hide();
           $('#newSearch').hide();
           $('#back').show();
-          var val = $(this).attr('data-id');
+         
           //$('.everything').hide();
           //$('.map').show();
-
+          var val = $(this).attr('data-id');
+          pIndex = val;
           console.log('VAL: ' + val);
           var destLat = servletdata.results[val].lat;
           var destLng = servletdata.results[val].lng;
           var srcLat = servletdata.sourceLat;
           var srcLng = servletdata.sourceLng;
           var end = servletdata.results[val].address;
+          //alert(end);
           //google.maps.event.addDomListener(window, 'load', initialize);//initialize(srcLat,srcLng,destLat,destLng);
           //calcRoute();
           initialize(srcLat, srcLng, destLat, destLng,end);
           //initialize(srcLat,srcLng,);
         });
       });
+
+      $(function(){
+        $('#direction-tabs').on('click','a',function(){
+          var listItems = $('#direction-tabs li');
+          var mode = $(this).attr('data-mode');
+          pMode = mode;
+          listItems.each(function(idx,li){
+            var tempMode = $(li).attr('value');
+            $(this).attr('class',' ');
+            if(mode==tempMode){
+              $(this).attr('class','active');
+            }
+          var val = pIndex;  
+          var destLat = servletdata.results[val].lat;
+          var destLng = servletdata.results[val].lng;
+          var srcLat = servletdata.sourceLat;
+          var srcLng = servletdata.sourceLng;
+          var end = servletdata.results[val].address;
+          //alert(end);
+          //google.maps.event.addDomListener(window, 'load', initialize);//initialize(srcLat,srcLng,destLat,destLng);
+          //calcRoute();
+          initialize(srcLat, srcLng, destLat, destLng,end);
+          });
+          
+          
+        });
+      });
+
        ///////////////////////////////////////////////////////////
        function printTextDirections(r){
-          $('#direction-steps').slideDown(1000);
+          $('#direction').slideDown(1000);
           var legs = r.routes[0].legs[0];
           var distance = legs.distance;
           var duration = legs.duration;
@@ -211,12 +285,15 @@
 
       function calculateRoute(slat, slng, dlat, dlng,end) {
 
+        var tMode = pMode;
+
+
         var request = {
           origin: new google.maps.LatLng(slat, slng),
           destination: new google.maps.LatLng(dlat, dlng),
           // waypoints: waypoints,
           optimizeWaypoints: true,
-          travelMode: google.maps.TravelMode.DRIVING
+          travelMode: google.maps.TravelMode[tMode]
         };
         directionsService.route(request, function(result, status) {
           if (status == google.maps.DirectionsStatus.OK) {
@@ -258,11 +335,15 @@
 
         });
 
-        $('#back').click(function(){
+        $('#back').on('click',function(){
+          previousMarker.setMap(previousMapResults);
+          console.log(previousMapResults);
+          console.log(previousMarker);
+          drawPoints(servletdata,servletdata.sourceLat,servletdata.sourceLng);
           $('#searchResults').show(500);
           $(this).hide(function(){
             $('#newSearch').show(500);
-            $('#direction-steps').slideUp(500);
+            $('#direction').slideUp(500);
           });
           
         });
@@ -281,27 +362,37 @@
         realLat = position.coords.latitude;
         realLng = position.coords.longitude;
         //alert("done");
-        begin(realLat, realLng);
+        begin(gLat, gLng);
       }
 
       function mapWithZip() {
-        var url = "http://192.168.0.29/testphp.php?query=" + encodeURIComponent(qS).replace('%20', '%3d') + "&miles=" + miles + "&zip=" + zip;
+        var url = "http://192.168.0.2/testphp.php?query=" + encodeURIComponent(qS).replace(/\%20/g, '%3d') + "&miles=" + miles + "&zip=" + encodeURIComponent(zip).replace(/\%20/g, '%3d');
         url += "&lat=null&lng=null";
         //$("#debug").html("didNotGetPositions");
         //alert(url);
         console.log("Final URL2: " + url);
         $.post(url, $(this).serialize(),
           function(json) {
+            servletdata = json;
             getTable(json);
-            //$('#tableID').html(table);                   
-            drawPoints(json, null, null);
+            //$('#tableID').html(table);
+            $('#map-canvas').show(1000, function() {
+              
+              $('#newSearch').slideDown(1000);
+              $('#searchResults').slideDown(1000);
+              drawPoints(json, null, null);
+            });
+            $('#searchForm').hide(1000);                   
+            
           }, 'json');
 
       }
 
       function begin(realLat, realLng) {
+        realLat = gLat;
+        realLng = gLng;
         zip = null;
-        url = "http://192.168.0.29/testphp.php?query=" + encodeURIComponent(qS).replace('%20', '%3d');
+        url = "http://192.168.0.2/testphp.php?query=" + encodeURIComponent(qS).replace(/\%20/g, '%3d');
         url += "&miles=" + miles;
         url += "&zip=null";
         //alert("hey");
@@ -344,7 +435,7 @@
             flag = navigator.geolocation;
           //alert(flag);
           if (flag) {
-            navigator.geolocation.getCurrentPosition(getPositions, mapWithZip);
+            navigator.geolocation.getCurrentPosition(begin, mapWithZip);
             //,{timeout:10000});
 
             //$("#debug").html("how the heck can it come here");
@@ -375,7 +466,7 @@
           var list = $('<h4 class="list-group-item-heading">').html(letterArray[i] + ': ' + results[i].name).appendTo(a);
           //var ul = $('<ul class = "list-group">').appendTo(list);
           //var span = $('<span class="details">').appendTo(ul);
-          var li = $('<p class = "list-group-item-text">').html(results[i].address + '</br>' + '<i>' + results[i].distance + ' miles </i>').appendTo(list);
+          var li = $('<p class = "list-group-item-text">').html(results[i].address + '</br>' +results[i].phone+'</br>'+results[i].rating+'</br>'+ '<i>' + results[i].distance + ' miles </i>').appendTo(list);
           //$(result).appendTo(div);
         }
 
@@ -492,6 +583,8 @@
         $('#map-canvas').css('height', mapWidth * 0.6);
         $('#map-canvas').css('width', mapWidth);
        // alert(mapWidth);
+       previousMapResults = map;
+        previousMarker = marker;
         marker.setMap(map);
         
 
