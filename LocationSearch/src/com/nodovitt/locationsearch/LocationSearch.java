@@ -2,8 +2,11 @@ package com.nodovitt.locationsearch;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -79,7 +82,7 @@ public class LocationSearch extends HttpServlet {
 		String longitude;
 		
 		if (srcLat.equals("null") || srcLng.equals("null") || zipCode.equals("null")==false) {
-			source = p.convertZipToGeo(Integer.parseInt(zipCode));
+			source = p.convertZipToGeo((zipCode));
 			latitude = Double.toString(source.getLat());
 			longitude = Double.toString(source.getLng());
 		} else {
@@ -97,11 +100,18 @@ public class LocationSearch extends HttpServlet {
 		CommonResult yelpResult = new YelpResult();
 		List<Result> yelpList = yelpResult.getCommonResult(zipCode, miles, query, latitude, longitude);
 		
-		googleList.addAll(yelpList);
-		Collections.sort(googleList);
+		//googleList.addAll(yelpList);
+		
+		HashSet<Result> resultsSet = new HashSet<Result>();
+		resultsSet.addAll(googleList);
+		resultsSet.addAll(yelpList);
+		
+		//remove duplicates based on phone number
+		List<Result> result = new ArrayList<Result>(resultsSet);
+		Collections.sort(result);
 		
 		CommonResultObject c = new CommonResultObject();
-		c.results = googleList;
+		c.results = result;
 		c.sourceLat = Double.parseDouble(latitude);
 		c.sourceLng = Double.parseDouble(longitude);
 		

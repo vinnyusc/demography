@@ -37,6 +37,9 @@ public class YelpResult implements CommonResult {
 			r.address = each.address1 + each.address2 + each.address3;
 			r.distance = each.distance;
 			r.name = each.name;
+			r.rating = (float)each.avg_rating;
+			r.phone = each.phone.replaceFirst("(\\d{3})(\\d{3})(\\d+)", "($1) $2-$3");
+			//replaceFirst("(\\d{3})(\\d{3})(\\d+)", "($1) $2-$3")
 			resultList.add(r);
 		}
 

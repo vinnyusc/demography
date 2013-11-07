@@ -27,6 +27,8 @@ public class GoogleObject {
 		public Geometry geometry;
 		public String name;
 		public String vicinity;
+		public String reference;
+		public GoogleObjectDetails details = new GoogleObjectDetails();
 		public double distance;
 		
 		public String formatted_address;
@@ -39,5 +41,6 @@ public class GoogleObject {
 			//result += "\nTypes: " + types;
 			return result;
 		}
+
 	}
 }

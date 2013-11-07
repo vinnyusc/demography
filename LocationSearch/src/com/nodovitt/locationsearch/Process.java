@@ -42,7 +42,7 @@ public class Process {
 	}
 
 	// Converts zip code to geo co ordinates - creates Node Object
-	public Node convertZipToGeo(int zip) {
+	public Node convertZipToGeo(String zip) {
 		String urlString = "http://maps.googleapis.com/maps/api/geocode/json?address=";
 		urlString += zip + "&sensor=true";
 

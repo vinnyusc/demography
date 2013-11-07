@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.nodovitt.locationsearch.CommonResult;
 import com.nodovitt.locationsearch.Process;
 import com.nodovitt.objects.GoogleObject;
+import com.nodovitt.objects.GoogleObjectDetails;
 import com.nodovitt.objects.Node;
 import com.nodovitt.objects.Result;
 
@@ -28,7 +29,7 @@ public class GoogleResult implements CommonResult {
 			double lat1 = eachResult.geometry.location.lat;
 			double lng1 = eachResult.geometry.location.lng;
 			double dist = p.computeDistance(latitude, longitude, lat1, lng1);
-			
+
 			DecimalFormat df = new DecimalFormat("####0.00");
 			eachResult.distance = Double.parseDouble(df.format(dist));
 		}
@@ -40,10 +41,12 @@ public class GoogleResult implements CommonResult {
 
 		List<Result> resultList = new ArrayList<Result>();
 		List<GoogleObject.Result> googleResults = g.results;
-		//CommonResultObject c = new CommonResultObject();
+		// CommonResultObject c = new CommonResultObject();
 
 		for (GoogleObject.Result each : googleResults) {
 			Result r = new Result();
+			r.phone = each.details.result.formatted_phone_number;
+			r.rating = each.details.result.rating;
 			r.address = each.vicinity;
 			r.lat = each.geometry.location.lat;
 			r.lng = each.geometry.location.lng;
@@ -56,14 +59,14 @@ public class GoogleResult implements CommonResult {
 
 	}
 
-	public List<Result> getCommonResult(String zip,
-			String miles, String query, String lat, String lng) {
+	public List<Result> getCommonResult(String zip, String miles, String query,
+			String lat, String lng) {
 
 		// Taking miles as default if not mentioned
 		if (miles == null) {
 			miles = Integer.toString(CommonResult.miles);
 		}
-		
+
 		latitude = Double.parseDouble(lat);
 		longitude = Double.parseDouble(lng);
 		/*
@@ -91,11 +94,28 @@ public class GoogleResult implements CommonResult {
 				// + query
 				+ "&sensor=true"
 				+ "&key=AIzaSyAEzoA7z11qqRiOXGdL0_UQX-F7Cl4GAoA";
-		
-		//System.out.println(url);
+
+		// System.out.println(url);
 
 		jsonString = p.getJsonString(url);
 		GoogleObject g = getGoogleObject(jsonString);
+
+		// Now for each of them, get details using new API
+		for (int i = 0;i<g.results.size();i++) {
+			String reference = g.results.get(i).reference;
+			String detailUrl = "https://maps.googleapis.com/maps/api/place/details/json?sensor=true";
+			detailUrl += "&reference=" + reference;
+			detailUrl += "&key=AIzaSyAEzoA7z11qqRiOXGdL0_UQX-F7Cl4GAoA";
+
+			String detailsJson = p.getJsonString(detailUrl);
+
+			Gson gson = new Gson();
+			GoogleObjectDetails response = gson.fromJson(detailsJson,
+					GoogleObjectDetails.class);
+
+			g.results.get(i).details = response;
+		}
+		//System.out.println(g.results.get(0).details.result.);
 		List<Result> list = getList(g);
 		return list;
 
